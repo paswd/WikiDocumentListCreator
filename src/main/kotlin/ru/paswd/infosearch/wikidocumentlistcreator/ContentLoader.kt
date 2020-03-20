@@ -13,6 +13,7 @@ object ContentLoader {
     private const val SPACE = "    "
 
     fun load(title: String, listener: OnStringResultListener) {
+        Thread.sleep(100L)
         ApiService.getApi()
             .getPageContent(title)
             .enqueue(object : Callback<ContentResponse> {
@@ -25,7 +26,7 @@ object ContentLoader {
                 }
 
                 override fun onFailure(call: Call<ContentResponse>, t: Throwable) {
-
+                    println("Loading document $title failed. Message: ${t.message}")
                 }
 
             })

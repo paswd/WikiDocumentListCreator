@@ -13,10 +13,14 @@ import java.io.File
 class TitleLoader {
 
     fun getAllChildrenTitles(root: String, file: File, onResultListener: OnResultListener)
-            = getAllChildrenTitles(root, file, -1, onResultListener)
+            = getAllChildrenTitles(root, file, -1, true, onResultListener)
 
-    fun getAllChildrenTitles(root: String, file: File, level: Int, onResultListener: OnResultListener) {
+    fun getAllChildrenTitles(root: String, file: File, level: Int, onResultListener: OnResultListener)
+            = getAllChildrenTitles(root, file, level, true, onResultListener)
+
+    fun getAllChildrenTitles(root: String, file: File, level: Int, first: Boolean, onResultListener: OnResultListener) {
         println("${DateTimeUtils.getCurrentDateTime()} [INFO]  In work: \"$root\"")
+        Thread.sleep(100L)
         ApiService.getApi()
             .getCategoryMembers(root, 500)
             .enqueue(
@@ -30,47 +34,48 @@ class TitleLoader {
                         if (response.body() == null)
                             return
 
-                        val items = mutableListOf<String>()
-
-                        var count = 0
-
-                        response.body()?.query?.categoryMembers?.forEach { page ->
-                            val title = page.title ?: ""
-                            val currentCount = count
-
-                            ContentLoader.load(title, OnStringResultListener{
-                                synchronized(file) {
-                                    if (currentCount != 0)
-                                        file.appendText(",\n")
-
-                                    file.appendText(it)
-                                }
-                            })
-                            items.add(title)
-                            count++
-                        }
-
-                        if (level == 0) {
-                            onResultListener.onResult()
-                            return
-                        }
+                        val categoryMembers = response.body()?.query?.categoryMembers
 
                         val categories = mutableListOf<String>()
 
-                        items.forEach { title ->
-                            if (title.contains("Категория:"))
-                                categories.add(title)
+                        if (level != 0) {
+                            categoryMembers?.forEach { page ->
+                                val title = page.title ?: ""
+                                if (title.contains("Категория:"))
+                                    categories.add(title)
+                            }
                         }
 
-                        if (categories.isEmpty()) {
-                            onResultListener.onResult()
-                            return
+                        var count = 0
+
+                        categoryMembers?.forEach { page ->
+                            val title = page.title ?: ""
+
+                            ContentLoader.load(title, OnStringResultListener{
+                                synchronized(file) {
+                                    synchronized(count) {
+                                        println("Loaded \"$title\"")
+                                        if (count != 0 || !first)
+                                            file.appendText(",\n")
+
+                                        file.appendText(it)
+
+                                        count++
+
+                                        if (categories.isEmpty() && count >= categoryMembers.size)
+                                            onResultListener.onResult()
+                                    }
+                                }
+                            })
                         }
+
+                        if (level == 0)
+                            return
 
                         count = 0
 
                         categories.forEach {
-                            getAllChildrenTitles(it, file, if (level == -1) -1 else level - 1, OnResultListener {
+                            getAllChildrenTitles(it, file, if (level == -1) -1 else level - 1, false, OnResultListener {
                                 synchronized (count) {
                                     count++
 
@@ -82,6 +87,7 @@ class TitleLoader {
                     }
 
                     override fun onFailure(call: Call<CategoryMembersResponse>, t: Throwable) {
+                        println("Loading category \"$root\" failed. Message: ${t.message}")
                     }
 
                 }
