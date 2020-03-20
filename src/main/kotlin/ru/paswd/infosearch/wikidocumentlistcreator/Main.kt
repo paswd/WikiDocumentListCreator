@@ -1,8 +1,10 @@
 package ru.paswd.infosearch.wikidocumentlistcreator
 
-import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnResultListener
+import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnLongResultListener
+import ru.paswd.infosearch.wikidocumentlistcreator.utils.DateTimeUtils
 import java.io.File
 import java.nio.file.Paths
+import java.util.*
 import kotlin.system.exitProcess
 
 const val ROOT_TITLE = "Категория:Авиация"
@@ -19,15 +21,22 @@ fun main(args: Array<String>) {
     file.writeText("")
 
     val loader = DocumentLoader()
-    loader.getAllChildren(ROOT_TITLE, file, 1, OnResultListener {
+    val timeStart = Calendar.getInstance()
+
+    loader.getAllChildren(ROOT_TITLE, file, 1, OnLongResultListener {
         //todo: сделать нормальный logger
-        println("Wrote to file: $absPath$DIR_PATH$FILE_PATH")
-        onSuccess()
+        val timeEnd = Calendar.getInstance()
+        onSuccess("$absPath$DIR_PATH$FILE_PATH", it, timeStart, timeEnd)
 
         exitProcess(0)
     })
 }
 
-fun onSuccess() {
+fun onSuccess(filePath: String, count: Long, timeStart: Calendar, timeEnd: Calendar) {
+    println("\n=========")
     println("[SUCCESS]")
+    println("Wrote to file: $filePath")
+    println("Total count: $count")
+    println("Begin: ${DateTimeUtils.getDateTime(timeStart)}")
+    println("End: ${DateTimeUtils.getDateTime(timeEnd)}")
 }
