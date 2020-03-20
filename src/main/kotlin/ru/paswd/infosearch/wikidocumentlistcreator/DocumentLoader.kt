@@ -7,6 +7,7 @@ import ru.paswd.infosearch.wikidocumentlistcreator.api.ApiService
 import ru.paswd.infosearch.wikidocumentlistcreator.api.dto.CategoryMembersResponse
 import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnLongResultListener
 import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnStringResultListener
+import ru.paswd.infosearch.wikidocumentlistcreator.logger.Log
 import ru.paswd.infosearch.wikidocumentlistcreator.utils.DateTimeUtils
 import java.io.File
 
@@ -19,9 +20,11 @@ class DocumentLoader {
             = getAllChildren(root, file, level, true, listener)
 
     fun getAllChildren(root: String, file: File, level: Int, first: Boolean, listener: OnLongResultListener) {
+
         onStart(file, first)
-        println("${DateTimeUtils.getDateTime()} [INFO]  In work: \"$root\"")
+        Log.info("Downloading category: \"$root\"")
         Thread.sleep(100L)
+
         ApiService.getApi()
             .getCategoryMembers(root, 500)
             .enqueue(
@@ -55,7 +58,7 @@ class DocumentLoader {
                             ContentLoader.load(title, OnStringResultListener{
                                 synchronized(file) {
                                     synchronized(count) {
-                                        println("Loaded \"$title\"")
+                                        Log.info("Loaded \"$title\"")
                                         if (!(count == 0 && first))
                                             file.appendText(",\n")
 
