@@ -5,6 +5,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.paswd.infosearch.wikidocumentlistcreator.api.ApiService
 import ru.paswd.infosearch.wikidocumentlistcreator.api.dto.CategoryMembersResponse
+import ru.paswd.infosearch.wikidocumentlistcreator.utils.DateTimeUtils
 import java.io.File
 
 class TitleLoader {
@@ -13,7 +14,7 @@ class TitleLoader {
             = getAllChildrenTitles(root, file, -1, onResultListener)
 
     fun getAllChildrenTitles(root: String, file: File, level: Int, onResultListener: OnResultListener) {
-        println("[INFO]  In work: \"$root\"")
+        println("${DateTimeUtils.getCurrentDateTime()} [INFO]  In work: \"$root\"")
         ApiService.getApi()
             .getCategoryMembers(root, 500)
             .enqueue(

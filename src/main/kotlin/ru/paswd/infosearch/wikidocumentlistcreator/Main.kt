@@ -17,7 +17,8 @@ fun main(args: Array<String>) {
     file.writeText("")
 
     val loader = TitleLoader()
-    loader.getAllChildrenTitles(ROOT_TITLE, file, 1, TitleLoader.OnResultListener {
+    loader.getAllChildrenTitles(ROOT_TITLE, file, TitleLoader.OnResultListener {
+        //todo: сделать нормальный logger
         println("Wrote to file: $absPath$DIR_PATH$FILE_PATH")
         onSuccess()
     })
