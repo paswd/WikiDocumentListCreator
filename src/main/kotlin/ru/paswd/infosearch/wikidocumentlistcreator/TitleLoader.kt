@@ -5,16 +5,15 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.paswd.infosearch.wikidocumentlistcreator.api.ApiService
 import ru.paswd.infosearch.wikidocumentlistcreator.api.dto.CategoryMembersResponse
-import ru.paswd.infosearch.wikidocumentlistcreator.exceptions.ApiException
+import java.io.File
 
 class TitleLoader {
 
-    var result = mutableListOf<String>()
+    fun getAllChildrenTitles(root: String, file: File, onResultListener: OnResultListener)
+            = getAllChildrenTitles(root, file, -1, onResultListener)
 
-    fun getAllChildrenTitles(root: String, onResultListener: OnResultListener)
-            = getAllChildrenTitles(root, -1, onResultListener)
-
-    fun getAllChildrenTitles(root: String, level: Int, onResultListener: OnResultListener) {
+    fun getAllChildrenTitles(root: String, file: File, level: Int, onResultListener: OnResultListener) {
+        println("[INFO]  In work: \"$root\"")
         ApiService.getApi()
             .getCategoryMembers(root, 500)
             .enqueue(
@@ -24,12 +23,17 @@ class TitleLoader {
                         call: Call<CategoryMembersResponse>,
                         response: Response<CategoryMembersResponse>
                     ) {
-                        if (response.body() == null)
-                            throw ApiException()
 
-                        synchronized (result) {
+                        if (response.body() == null)
+                            return
+
+                        val items = mutableListOf<String>()
+
+                        synchronized (file) {
                             response.body()?.query?.categoryMembers?.forEach { page ->
-                                result.add(page.title ?: "")
+                                val title = page.title ?: ""
+                                file.appendText(title + "\n")
+                                items.add(title)
                             }
                         }
 
@@ -40,7 +44,7 @@ class TitleLoader {
 
                         val categories = mutableListOf<String>()
 
-                        result.forEach { title ->
+                        items.forEach { title ->
                             if (title.contains("Категория:"))
                                 categories.add(title)
                         }
@@ -53,7 +57,7 @@ class TitleLoader {
                         var count = 0
 
                         categories.forEach {
-                            getAllChildrenTitles(it, if (level == -1) -1 else level - 1, OnResultListener {
+                            getAllChildrenTitles(it, file, if (level == -1) -1 else level - 1, OnResultListener {
                                 synchronized (count) {
                                     count++
 
@@ -65,7 +69,6 @@ class TitleLoader {
                     }
 
                     override fun onFailure(call: Call<CategoryMembersResponse>, t: Throwable) {
-                        throw ApiException()
                     }
 
                 }
