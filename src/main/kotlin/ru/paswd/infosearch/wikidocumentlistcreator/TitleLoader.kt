@@ -5,6 +5,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.paswd.infosearch.wikidocumentlistcreator.api.ApiService
 import ru.paswd.infosearch.wikidocumentlistcreator.api.dto.CategoryMembersResponse
+import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnResultListener
+import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnStringResultListener
 import ru.paswd.infosearch.wikidocumentlistcreator.utils.DateTimeUtils
 import java.io.File
 
@@ -30,12 +32,22 @@ class TitleLoader {
 
                         val items = mutableListOf<String>()
 
-                        synchronized (file) {
-                            response.body()?.query?.categoryMembers?.forEach { page ->
-                                val title = page.title ?: ""
-                                file.appendText(title + "\n")
-                                items.add(title)
-                            }
+                        var count = 0
+
+                        response.body()?.query?.categoryMembers?.forEach { page ->
+                            val title = page.title ?: ""
+                            val currentCount = count
+
+                            ContentLoader.load(title, OnStringResultListener{
+                                synchronized(file) {
+                                    if (currentCount != 0)
+                                        file.appendText(",\n")
+
+                                    file.appendText(it)
+                                }
+                            })
+                            items.add(title)
+                            count++
                         }
 
                         if (level == 0) {
@@ -55,7 +67,7 @@ class TitleLoader {
                             return
                         }
 
-                        var count = 0
+                        count = 0
 
                         categories.forEach {
                             getAllChildrenTitles(it, file, if (level == -1) -1 else level - 1, OnResultListener {
@@ -74,16 +86,5 @@ class TitleLoader {
 
                 }
             )
-    }
-
-    interface OnResultListener {
-        fun onResult()
-
-        companion object {
-            inline operator fun invoke(crossinline op: () -> Unit) =
-                object : OnResultListener {
-                    override fun onResult() = op()
-                }
-        }
     }
 }
