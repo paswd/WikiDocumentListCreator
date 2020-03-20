@@ -56,7 +56,7 @@ class DocumentLoader {
                                 synchronized(file) {
                                     synchronized(count) {
                                         println("Loaded \"$title\"")
-                                        if (count != 0 || !first)
+                                        if (!(count == 0 && first))
                                             file.appendText(",\n")
 
                                         file.appendText(it)
@@ -73,14 +73,14 @@ class DocumentLoader {
                         if (level == 0)
                             return
 
-                        count = 0
+                        var categoriesCount = 0
 
                         categories.forEach {
                             getAllChildren(it, file, if (level == -1) -1 else level - 1, false, OnResultListener {
-                                synchronized (count) {
-                                    count++
+                                synchronized (categoriesCount) {
+                                    categoriesCount++
 
-                                    if (count == categories.size)
+                                    if (categoriesCount == categories.size)
                                         onFinish(file, first, onResultListener)
                                 }
                             })

@@ -19,7 +19,7 @@ fun main(args: Array<String>) {
     file.writeText("")
 
     val loader = DocumentLoader()
-    loader.getAllChildren(ROOT_TITLE, file, 0, OnResultListener {
+    loader.getAllChildren(ROOT_TITLE, file, 1, OnResultListener {
         //todo: сделать нормальный logger
         println("Wrote to file: $absPath$DIR_PATH$FILE_PATH")
         onSuccess()
