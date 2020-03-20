@@ -16,12 +16,11 @@ fun main(args: Array<String>) {
     dir.mkdirs()
     val file = File(absPath + DIR_PATH + FILE_PATH)
     file.createNewFile()
-    file.writeText("[\n")
+    file.writeText("")
 
-    val loader = TitleLoader()
-    loader.getAllChildrenTitles(ROOT_TITLE, file, 0, OnResultListener {
+    val loader = DocumentLoader()
+    loader.getAllChildren(ROOT_TITLE, file, 0, OnResultListener {
         //todo: сделать нормальный logger
-        file.appendText("\n]\n")
         println("Wrote to file: $absPath$DIR_PATH$FILE_PATH")
         onSuccess()
 
