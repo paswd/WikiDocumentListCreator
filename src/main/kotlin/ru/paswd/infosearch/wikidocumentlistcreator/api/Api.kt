@@ -44,7 +44,7 @@ interface Api {
         formatVersion: Int = 2,
 
         @Query("prop")
-        prop: String = "wikitext",
+        prop: String = "text",
 
         @Query("action")
         action: String = "parse"

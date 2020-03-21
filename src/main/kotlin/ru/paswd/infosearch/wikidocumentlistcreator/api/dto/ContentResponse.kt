@@ -16,7 +16,7 @@ data class ContentResponse (
         @JsonProperty("pageid")
         var pageId: Long?,
 
-        @JsonProperty("wikitext")
-        var wikiText: String?
+        @JsonProperty("text")
+        var text: String?
     )
 }
