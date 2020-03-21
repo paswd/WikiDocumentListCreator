@@ -1,16 +1,28 @@
 package ru.paswd.infosearch.wikidocumentlistcreator.logger
 
 import ru.paswd.infosearch.wikidocumentlistcreator.utils.DateTimeUtils
+import java.io.File
 
-object Log {
+object Logger {
 
     private const val PREFIX_INFO = "INFO"
     private const val PREFIX_WARN = "WARN"
     private const val PREFIX_ERROR = "ERROR"
     private const val PREFIX_DEBUG = "DEBUG"
 
+    private var file: File? = null
+
+    fun log(message: String) = log(message, "")
+
     fun log(message: String, prefix: String) {
-        println("${DateTimeUtils.getDateTime()} [$prefix]  $message")
+        var out = ""
+        if (prefix.isNotEmpty())
+            out += "${DateTimeUtils.getDateTime()} [$prefix]  "
+
+        out += message + "\n"
+
+        print(out)
+        file?.appendText(out)
     }
 
     fun info(message: String) {
@@ -29,4 +41,8 @@ object Log {
         log(message, PREFIX_DEBUG)
     }
 
+    fun setOutput(filename: String) {
+        file = File(filename)
+        file?.writeText("")
+    }
 }
