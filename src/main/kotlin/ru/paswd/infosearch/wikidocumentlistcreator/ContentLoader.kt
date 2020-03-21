@@ -6,6 +6,7 @@ import retrofit2.Response
 import ru.paswd.infosearch.wikidocumentlistcreator.api.ApiService
 import ru.paswd.infosearch.wikidocumentlistcreator.api.dto.ContentResponse
 import ru.paswd.infosearch.wikidocumentlistcreator.listeners.OnStringResultListener
+import ru.paswd.infosearch.wikidocumentlistcreator.logger.Log
 import ru.paswd.infosearch.wikidocumentlistcreator.utils.StringUtils
 
 object ContentLoader {
@@ -25,7 +26,7 @@ object ContentLoader {
                 }
 
                 override fun onFailure(call: Call<ContentResponse>, t: Throwable) {
-                    println("Loading document $title failed. Message: ${t.message}")
+                    Log.error("Loading document $title failed. Message: ${t.message}")
                 }
 
             })
@@ -35,7 +36,8 @@ object ContentLoader {
         var res = "$SPACE{\n"
         res += "${SPACE}${SPACE}\"title\": \"${data.title}\",\n"
         res += "${SPACE}${SPACE}\"pageId\": ${data.pageId},\n"
-        res += "${SPACE}${SPACE}\"text\": \"${StringUtils.convertJsonSpecialChars(data.wikiText ?: "")}\"\n"
+        res += "${SPACE}${SPACE}\"text\": \"${StringUtils.convertJsonSpecialChars(
+            StringUtils.removeMarkup(data.text))}\"\n"
         res += "$SPACE}"
 
         return res

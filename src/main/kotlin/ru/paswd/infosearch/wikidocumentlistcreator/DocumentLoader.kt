@@ -102,7 +102,7 @@ class DocumentLoader {
                     }
 
                     override fun onFailure(call: Call<CategoryMembersResponse>, t: Throwable) {
-                        println("Loading category \"$root\" failed. Message: ${t.message}")
+                        Log.error("Loading category \"$root\" failed. Message: ${t.message}")
                     }
 
                 }
