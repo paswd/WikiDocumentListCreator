@@ -13,6 +13,10 @@ import java.io.File
 
 class DocumentLoader {
 
+    companion object {
+        const val SLEEP_INTERVAL = 50L
+    }
+
     fun getAllChildren(root: String, file: File, listener: OnLongResultListener)
             = getAllChildren(root, file, -1, true, listener)
 
@@ -23,7 +27,6 @@ class DocumentLoader {
 
         onStart(file, first)
         Log.info("Downloading category: \"$root\"")
-        Thread.sleep(100L)
 
         ApiService.getApi()
             .getCategoryMembers(root, 500)
@@ -55,6 +58,7 @@ class DocumentLoader {
                         categoryMembers?.forEach { page ->
                             val title = page.title ?: ""
 
+                            Thread.sleep(SLEEP_INTERVAL)
                             ContentLoader.load(title, OnStringResultListener{
                                 synchronized(file) {
                                     synchronized(count) {
@@ -80,6 +84,8 @@ class DocumentLoader {
                         var childrenCount = 0L
 
                         categories.forEach {
+                            Thread.sleep(SLEEP_INTERVAL)
+
                             getAllChildren(it, file, if (level == -1) -1 else level - 1, false, OnLongResultListener {
                                 synchronized (childrenCount) {
                                     childrenCount += it

@@ -13,7 +13,6 @@ object ContentLoader {
     private const val SPACE = "    "
 
     fun load(title: String, listener: OnStringResultListener) {
-        Thread.sleep(100L)
         ApiService.getApi()
             .getPageContent(title)
             .enqueue(object : Callback<ContentResponse> {
@@ -35,8 +34,8 @@ object ContentLoader {
     private fun toJson(data: ContentResponse.Data): String {
         var res = "$SPACE{\n"
         res += "${SPACE}${SPACE}\"title\": \"${data.title}\",\n"
-        res += "${SPACE}${SPACE}\"pageid\": ${data.pageId},\n"
-        res += "${SPACE}${SPACE}\"wikitext\": \"${StringUtils.convertJsonSpecialChars(data.wikiText ?: "")}\"\n"
+        res += "${SPACE}${SPACE}\"pageId\": ${data.pageId},\n"
+        res += "${SPACE}${SPACE}\"text\": \"${StringUtils.convertJsonSpecialChars(data.wikiText ?: "")}\"\n"
         res += "$SPACE}"
 
         return res
