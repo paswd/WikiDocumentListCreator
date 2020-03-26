@@ -13,11 +13,11 @@ interface Api {
 
     @GET(API_PATH)
     fun getCategoryMembers(
-        @Query("cmtitle")
-        title: String,
+        @Query("cmpageid")
+        pageId: Long?,
 
         @Query("cmlimit")
-        limit: Int,
+        limit: Int = 500,
 
         @Query("action")
         action: String = "query",
@@ -33,9 +33,27 @@ interface Api {
     ): Call<CategoryMembersResponse>
 
     @GET(API_PATH)
-    fun getPageContent(
+    fun getPageContentByTitle(
         @Query("page")
-        title: String,
+        title: String?,
+
+        @Query("format")
+        format: String = "json",
+
+        @Query("formatversion")
+        formatVersion: Int = 2,
+
+        @Query("prop")
+        prop: String = "text",
+
+        @Query("action")
+        action: String = "parse"
+    ): Call<ContentResponse>
+
+    @GET(API_PATH)
+    fun getPageContentById(
+        @Query("pageid")
+        pageId: Long?,
 
         @Query("format")
         format: String = "json",

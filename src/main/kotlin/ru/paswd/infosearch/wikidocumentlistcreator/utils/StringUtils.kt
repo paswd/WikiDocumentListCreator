@@ -19,4 +19,20 @@ object StringUtils {
 
         return Jsoup.parse(markup).text()
     }
+
+    private const val SPACE = "    "
+
+    fun getSpace(): String {
+        return SPACE
+    }
+
+    fun getSpace(shift: Int): String {
+        var res = ""
+
+        for (i in 0 until shift) {
+            res += getSpace()
+        }
+
+        return res
+    }
 }
