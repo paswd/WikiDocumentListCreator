@@ -77,10 +77,10 @@ class GraphParserImpl : GraphParser() {
     }
 
     private fun iteration(listener: OnResultListener) {
-        var levelSize = queue.size
+        val levelSize = queue.size
         val currentDepth = queue.peek().second
 
-        if (currentDepth > depthLimit) {
+        if (currentDepth > depthLimit && depthLimit != -1) {
             listener.onResult()
             return
         }
@@ -115,7 +115,7 @@ class GraphParserImpl : GraphParser() {
                                 || response.body()?.query == null
                                 || response.body()?.query?.categoryMembers == null
                             ) {
-                                Logger.warn("Level ${currentElement.second} | Cannot get elements of category \"${currentElement.first}\"")
+                                Logger.warn("Level ${currentElement.second} | Cannot get elements of category \"${currentElement.first}\". Message: \"Empty body\"")
                                 threadListener.append()
                                 return
                             }
@@ -152,7 +152,7 @@ class GraphParserImpl : GraphParser() {
                         }
 
                         override fun onFailure(call: Call<CategoryMembersResponse>, t: Throwable) {
-                            Logger.warn("Level ${currentElement.second} | Cannot get elements of category \"${currentElement.first}\"")
+                            Logger.warn("Level ${currentElement.second} | Cannot get elements of category \"${currentElement.first}\". Message: \"${t.message}\"")
                             threadListener.append()
                         }
 
@@ -208,8 +208,6 @@ class GraphParserImpl : GraphParser() {
                                 }
                                 Logger.info("($count / $size) Saved \"$title\"")
                             }
-                        } else {
-                            Logger.error("($count / $size) Api error")
                         }
                     }
 

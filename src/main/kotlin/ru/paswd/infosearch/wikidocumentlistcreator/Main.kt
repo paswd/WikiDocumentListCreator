@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
     val parser: GraphParser = GraphParserImpl()
     val timeStart = Calendar.getInstance()
 
-    parser.parse(ROOT_TITLE, file, 0, OnLongResultListener {
+    parser.parse(ROOT_TITLE, file, OnLongResultListener {
         //todo: сделать нормальный logger
         val timeEnd = Calendar.getInstance()
         onSuccess("$absPath$DIR_PATH$FILE_PATH", it, timeStart, timeEnd)
