@@ -8,9 +8,9 @@ import java.nio.file.Paths
 import java.util.*
 import kotlin.system.exitProcess
 
-const val ROOT_TITLE = "Категория:Авиация"
+const val ROOT_TITLE = "Категория:Всё"
 const val DIR_PATH = "/output/"
-const val FILE_PATH = "aviation.json"
+const val FILE_PATH = "data.json"
 const val LOG_PATH = "log.txt"
 
 fun main(args: Array<String>) {

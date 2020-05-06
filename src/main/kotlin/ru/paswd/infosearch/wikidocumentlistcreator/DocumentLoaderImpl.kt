@@ -34,7 +34,8 @@ class DocumentLoaderImpl(val shift: Int) : DocumentLoader {
 
     private fun toJson(data: ContentResponse.Data): String {
         var res = "${getSpace()}{\n"
-        res += "${getSpace()}${StringUtils.getSpace()}\"title\": \"${data.title}\",\n"
+        res += "${getSpace()}${StringUtils.getSpace()}\"title\": \"${StringUtils.convertJsonSpecialChars(
+            StringUtils.removeMarkup(data.title))}\",\n"
         res += "${getSpace()}${StringUtils.getSpace()}\"pageId\": ${data.pageId},\n"
         res += "${getSpace()}${StringUtils.getSpace()}\"text\": \"${StringUtils.convertJsonSpecialChars(
             StringUtils.removeMarkup(data.text))}\"\n"
