@@ -32,7 +32,7 @@ class DocumentLoaderImpl(val shift: Int) : DocumentLoader {
             })
     }
 
-    private fun toJson(data: ContentResponse.Data): String {
+    internal fun toJson(data: ContentResponse.Data): String {
         var res = "${getSpace()}{\n"
         res += "${getSpace()}${StringUtils.getSpace()}\"title\": \"${StringUtils.convertJsonSpecialChars(
             StringUtils.removeMarkup(data.title))}\",\n"

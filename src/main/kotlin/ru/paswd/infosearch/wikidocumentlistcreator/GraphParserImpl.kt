@@ -30,7 +30,9 @@ class GraphParserImpl : GraphParser() {
     private var depthLimit = -1
     private var listener: OnLongResultListener? = null
 
-    override fun parse(root: String, file: File, depth: Int, listener: OnLongResultListener) {
+    private var rootList = listOf<String>()
+
+    override fun parse(rootList: List<String>, file: File, depth: Int, listener: OnLongResultListener) {
         if (locked) {
             Logger.warn("Parser is locked")
             return
@@ -38,18 +40,33 @@ class GraphParserImpl : GraphParser() {
 
         Logger.info("Getting document list...")
 
+        this.rootList = rootList
+
         locked = true
 
         this.file = file
         this.depthLimit = depth
         this.listener = listener
 
-        getRootPageId(root)
+        getRootPageId()
     }
 
-    private fun getRootPageId(root: String) {
+
+    private fun getRootPageId() {
+        synchronized(queue) {
+            if (queue.size >= rootList.size) {
+                iteration(OnResultListener {
+                    Logger.info("Documents list successfully created")
+                    Logger.info("Starting export to file...")
+                    printResults()
+                })
+
+                return
+            }
+        }
+
         ApiService.getApi()
-            .getPageContentByTitle(root)
+            .getPageContentByTitle(rootList[queue.size])
             .enqueue(object : Callback<ContentResponse> {
 
                 override fun onResponse(call: Call<ContentResponse>, response: Response<ContentResponse>) {
@@ -60,13 +77,11 @@ class GraphParserImpl : GraphParser() {
                         onFatalError(ROOT_ELEMENT_ERROR_MSG)
                     }
 
-                    queue.add(Pair(response.body()?.data?.pageId ?: -1, 0))
+                    synchronized(queue) {
+                        queue.add(Pair(response.body()?.data?.pageId ?: -1, 0))
+                    }
 
-                    iteration(OnResultListener {
-                        Logger.info("Documents list successfully created")
-                        Logger.info("Starting export to file...")
-                        printResults()
-                    })
+                    getRootPageId()
                 }
 
                 override fun onFailure(call: Call<ContentResponse>, t: Throwable) {

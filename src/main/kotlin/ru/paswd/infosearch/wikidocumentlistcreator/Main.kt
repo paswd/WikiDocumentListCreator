@@ -8,7 +8,10 @@ import java.nio.file.Paths
 import java.util.*
 import kotlin.system.exitProcess
 
-const val ROOT_TITLE = "Категория:Всё"
+val ROOT_TITLES = listOf(
+    "Категория:Категория1",
+    "Категория:Категория2"
+)
 const val DIR_PATH = "/output/"
 const val FILE_PATH = "data.json"
 const val LOG_PATH = "log.txt"
@@ -27,7 +30,7 @@ fun main(args: Array<String>) {
     val parser: GraphParser = GraphParserImpl()
     val timeStart = Calendar.getInstance()
 
-    parser.parse(ROOT_TITLE, file, OnLongResultListener {
+    parser.parse(ROOT_TITLES, file, OnLongResultListener {
         //todo: сделать нормальный logger
         val timeEnd = Calendar.getInstance()
         onSuccess("$absPath$DIR_PATH$FILE_PATH", it, timeStart, timeEnd)
